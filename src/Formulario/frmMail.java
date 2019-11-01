@@ -6,7 +6,18 @@
 package Formulario;
 
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -78,16 +89,63 @@ public class frmMail extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
-        Properties propiedad = new Properties();
-        propiedad.setProperty("mail smtp host", "smtp gmail com");
-        propiedad.setProperty("mail.smtp.starttls.enable", "true");
-        propiedad.setProperty("mail.smtp.port", "587");
-        propiedad.setProperty("mail.smtp.auth", "true");
-        
-        Session sesion = Session.getDefaultInstance(propiedad);
+        Properties props = new Properties();
+//        props.setProperty("mail smtp host", "smtp gmail com");
+//        props.setProperty("mail.smtp.starttls.enable", "true");
+//        props.setProperty("mail smtp port", "587");
+//        props.setProperty("mail.smtp.auth", "true");
+
+        final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+        props.setProperty("mail.smtp.host", "smtp.gmail.com");
+        props.setProperty("mail.smtp.socketFactory.class", SSL_FACTORY);
+        props.setProperty("mail.smtp.socketFactory.fallback", "false");
+        props.setProperty("mail.smtp.port", "465");
+        props.setProperty("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.debug", "true");
+        props.put("mail.store.protocol", "pop3");
+        props.put("mail.transport.protocol", "smtp");
+
         
         String correoEnvia = "bbot70707@gmail.com";
         String contraseña = "botbotbotbot";
+        String destinatario = txtCorreo.getText();
+        String asunto = "Este es el asunto";
+        String mensaje = "Este es el mensaje";
+        
+        Session sesion = Session.getDefaultInstance(props);
+        
+        
+   
+        
+        MimeMessage mail =  new MimeMessage(sesion);
+        
+ 
+        try {
+            mail.setFrom(new InternetAddress(correoEnvia));
+            mail.addRecipient(Message.RecipientType.TO, new InternetAddress(destinatario));
+            mail.setSubject(asunto);
+            mail.setText(mensaje);
+                
+                
+                Transport transporte = sesion.getTransport("smtp");
+                transporte.connect(correoEnvia,contraseña);
+                transporte.sendMessage(mail, mail.getRecipients(Message.RecipientType.TO));
+                transporte.close();
+                
+                JOptionPane.showMessageDialog(null, "correo enviado"); 
+                
+                
+        } catch (AddressException ex) {
+            Logger.getLogger(frmMail.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (MessagingException ex) {
+            Logger.getLogger(frmMail.class.getName()).log(Level.SEVERE, null, ex);
+        }
+           
+        
+                
+    
+        
     }//GEN-LAST:event_btnEnviarActionPerformed
 
     /**
