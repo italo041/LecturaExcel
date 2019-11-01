@@ -5,6 +5,18 @@
  */
 package Formulario;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+ 
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 /**
  *
  * @author USP
@@ -17,6 +29,8 @@ public class frmAgregrarLibro extends javax.swing.JDialog {
     public frmAgregrarLibro(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        
+        
     }
 
     /**
@@ -72,6 +86,11 @@ public class frmAgregrarLibro extends javax.swing.JDialog {
 
         jButton1.setText("Agregar");
         jButton1.setName("btnagrgar"); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Limpiar");
 
@@ -228,6 +247,58 @@ public class frmAgregrarLibro extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+      	String nombreArchivo="archivo.xlsx";
+	String rutaArchivo= "C:\\Users\\USP\\Documents\\git\\LecturaExcel\\libro"+"archivo.xlsx";
+	String hoja="LIBROS FISICOS MATRZ";
+        
+        System.out.println("conectado bb");
+		
+	XSSFWorkbook libro= new XSSFWorkbook();
+	XSSFSheet hoja1 = libro.createSheet(hoja);
+        
+        String [] header= new String[]{"Ord", "PRINCIPAL","SUBNIVEL 1","SUBNIVEL 2","titulo","autor","isbn/issn","Idioma","Edicion ","Editorial","Año","Ejemplar","Tipo"};
+        
+        String [][] document= new String [][]{
+		{"13701","Tecnologia","ingenieria","fisica","la fisica aplicada","ronaldo","963258741","eng","hola","el lobo","1992","1","fisico"},
+				
+	};
+        		for (int i = 0; i <= document.length; i++) {
+			XSSFRow row=hoja1.createRow(i);//se crea las filas
+			for (int j = 0; j <header.length; j++) {
+				if (i==0) {//para la cabecera
+						XSSFCell cell= row.createCell(j);//se crea las celdas para la cabecera, junto con la posición
+						//ll.setCellStyle(style); // se añade el style crea anteriormente 
+						cell.setCellValue(header[j]);//se añade el contenido					
+				}else{//para el contenido
+					XSSFCell cell= row.createCell(j);//se crea las celdas para la contenido, junto con la posición
+					cell.setCellValue(document[i-1][j]); //se añade el contenido
+				}				
+			}
+		}
+                        
+            File file;
+		file = new File(rutaArchivo);
+		try (FileOutputStream fileOuS = new FileOutputStream(file)){						
+			if (file.exists()) {// si el archivo existe se elimina
+				file.delete();
+				System.out.println("Archivo eliminado");
+			}
+			libro.write(fileOuS);
+			fileOuS.flush();
+			fileOuS.close();
+			System.out.println("Archivo Creado");
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+ 
+	
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
