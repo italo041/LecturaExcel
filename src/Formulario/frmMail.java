@@ -8,16 +8,23 @@ package Formulario;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.swing.JOptionPane;
+
 
 /**
  *
@@ -28,9 +35,15 @@ public class frmMail extends javax.swing.JDialog {
     /**
      * Creates new form frmMail
      */
+    
+    
+    
+    
     public frmMail(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        
+        
     }
 
     /**
@@ -116,8 +129,8 @@ public class frmMail extends javax.swing.JDialog {
      
       
         String destinatario = txtCorreo.getText();
-        String asunto = "Este es el asunto";
-        String mensaje = "Este es el mensaje";
+        String asunto = "Un libro en un archivo txt enviado desde Java";
+        String mensaje = "Hola se te envia en un adjunto el libro en formato txt";
     
      Session sesion = Session.getDefaultInstance(props, 
                           new Authenticator(){
@@ -128,15 +141,38 @@ public class frmMail extends javax.swing.JDialog {
         
 
         
-        MimeMessage mail =  new MimeMessage(sesion);
+        MimeMessage mail =  new MimeMessage(sesion);   
+        
+        //Se crean estos objetos para enviar archivos
+        MimeBodyPart messageBodyPart = new MimeBodyPart();
+        
+        MimeBodyPart texto = new MimeBodyPart();
         
  
+	Multipart multipart = new MimeMultipart();
+        //----------------------------------------
+        
+        String file = "txt/libro.txt";
+	String fileName = "libro.txt";
+        
+        DataSource source = new FileDataSource(file);
+        
+         
+       
         try {
+            // En esta parte es donde se hace la configuracion del archivo txt y el mensaje
+             texto.setText(mensaje);
+             messageBodyPart.setDataHandler(new DataHandler(source));
+             messageBodyPart.setFileName(fileName);
+             multipart.addBodyPart(messageBodyPart);
+             multipart.addBodyPart(texto);
+ 
+            //----------------------------------------------------------
+            
             mail.setFrom(new InternetAddress(correoEnvia));
             mail.addRecipient(Message.RecipientType.TO, new InternetAddress(destinatario));
             mail.setSubject(asunto);
-            mail.setText(mensaje);
-                
+            mail.setContent(multipart);   
                 
                 Transport transporte = sesion.getTransport("smtp");
                 transporte.connect(correoEnvia,contraseña);
@@ -196,6 +232,8 @@ public class frmMail extends javax.swing.JDialog {
                     }
                 });
                 dialog.setVisible(true);
+                
+                
             }
         });
     }
