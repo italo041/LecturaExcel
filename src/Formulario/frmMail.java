@@ -103,7 +103,7 @@ public class frmMail extends javax.swing.JDialog {
 
     private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
         
-            
+        boolean isValid = false;    
         
         
         Properties props = new Properties();
@@ -157,36 +157,43 @@ public class frmMail extends javax.swing.JDialog {
         
         DataSource source = new FileDataSource(file);
         
-         
+         isValid = validateEmail(destinatario);
+            // SI ES TRUE SIGUE LA EJECUCION DEL PROGRAMA   
+            if (isValid) {
+                                try {
+
+                        // En esta parte es donde se hace la configuracion del archivo txt y el mensaje
+                         texto.setText(mensaje);
+                         messageBodyPart.setDataHandler(new DataHandler(source));
+                         messageBodyPart.setFileName(fileName);
+                         multipart.addBodyPart(messageBodyPart);
+                         multipart.addBodyPart(texto);
+
+                        //----------------------------------------------------------
+
+                        mail.setFrom(new InternetAddress(correoEnvia));
+                        mail.addRecipient(Message.RecipientType.TO, new InternetAddress(destinatario));
+                        mail.setSubject(asunto);
+                        mail.setContent(multipart);   
+
+                            Transport transporte = sesion.getTransport("smtp");
+                            transporte.connect(correoEnvia,contraseña);
+                            transporte.sendMessage(mail, mail.getRecipients(Message.RecipientType.TO));
+                            transporte.close();
+
+                            JOptionPane.showMessageDialog(null, "Correo enviado a: "+destinatario); 
+
+
+                    } catch (AddressException ex) {
+                        Logger.getLogger(frmMail.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (MessagingException ex) {
+                        Logger.getLogger(frmMail.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+            } else {
+                JOptionPane.showMessageDialog(null, "Correo invalido");
+            }
        
-        try {
-            // En esta parte es donde se hace la configuracion del archivo txt y el mensaje
-             texto.setText(mensaje);
-             messageBodyPart.setDataHandler(new DataHandler(source));
-             messageBodyPart.setFileName(fileName);
-             multipart.addBodyPart(messageBodyPart);
-             multipart.addBodyPart(texto);
- 
-            //----------------------------------------------------------
-            
-            mail.setFrom(new InternetAddress(correoEnvia));
-            mail.addRecipient(Message.RecipientType.TO, new InternetAddress(destinatario));
-            mail.setSubject(asunto);
-            mail.setContent(multipart);   
-                
-                Transport transporte = sesion.getTransport("smtp");
-                transporte.connect(correoEnvia,contraseña);
-                transporte.sendMessage(mail, mail.getRecipients(Message.RecipientType.TO));
-                transporte.close();
-                
-                JOptionPane.showMessageDialog(null, "correo enviado"); 
-                
-                
-        } catch (AddressException ex) {
-            Logger.getLogger(frmMail.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (MessagingException ex) {
-            Logger.getLogger(frmMail.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
            
         
                 
@@ -194,6 +201,11 @@ public class frmMail extends javax.swing.JDialog {
         
     }//GEN-LAST:event_btnEnviarActionPerformed
 
+    
+    
+    
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -236,6 +248,21 @@ public class frmMail extends javax.swing.JDialog {
                 
             }
         });
+    }
+    
+    //Creacion de metodo para validar email
+    private boolean validateEmail(String email) {
+        boolean isValid = false;
+        try {
+            // Create InternetAddress object and validated the supplied
+            // address which is this case is an email address.
+            InternetAddress internetAddress = new InternetAddress(email);
+            internetAddress.validate();
+            isValid = true;
+        } catch (AddressException e) {
+            e.printStackTrace();
+        }
+        return isValid;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
