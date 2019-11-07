@@ -9,6 +9,7 @@ import Formulario.Principal;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+ 
 /**
  *
  * @author USP
@@ -21,7 +22,7 @@ public class LecturaExcel {
     public static void main(String[] args) {
         Principal principal=new Principal();
         principal.setVisible(true);
-        
+         
         try {
             String ruta = "txt/libro.txt";
             String contenido = "Contenido de ejemplo";

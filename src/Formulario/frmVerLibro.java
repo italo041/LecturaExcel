@@ -23,6 +23,7 @@ public class frmVerLibro extends javax.swing.JDialog {
     public frmVerLibro(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setLocationRelativeTo(null);
         LeerLibro();
     }
     
